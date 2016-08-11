@@ -15,12 +15,20 @@ public class GunControl : MonoBehaviour {
     {
         InvokeRepeating("Spawn", spawnTime, spawnTime);
         au = GetComponent<AudioSource>();
-        
     }
 
     void Spawn()
     {
-        Instantiate(bullet, fire.transform.position, Quaternion.Euler(-90, 0, 0));
+        GameObject obj = Instantiate(bullet, fire.transform.position, Quaternion.identity) as GameObject;
+        BulletControl b = obj.GetComponent<BulletControl>();
+        if (b != null)
+        {
+            b.OnFire = FireAudio;
+        }
+    }
+
+    void FireAudio()
+    {
         au.Play();
     }
 }

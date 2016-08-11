@@ -1,4 +1,5 @@
 ﻿using UnityEngine;
+using System;
 using System.Collections;
 
 [RequireComponent(typeof(Rigidbody))]
@@ -9,6 +10,11 @@ public class BulletControl : MonoBehaviour {
     private float waitTime;
     [SerializeField]
     private GameObject hitPoint;
+    [SerializeField]
+    private TextMesh timeText;
+
+    public delegate void BulletEvent();
+    public BulletEvent OnFire;
 
     Rigidbody body;
     float startTime;
@@ -36,10 +42,18 @@ public class BulletControl : MonoBehaviour {
             {
                 start = true;
                 sound.Play();
+                timeText.gameObject.SetActive(false);
+
+                if (OnFire != null)
+                {
+                    OnFire();
+                }
             }
             else
             {
-                int t = (int)(waitTime - (Time.time - startTime));
+                
+                double t = Math.Round(waitTime - (Time.time - startTime), 1, MidpointRounding.AwayFromZero);
+                timeText.text = t.ToString();
             }
         }
 
@@ -50,8 +64,9 @@ public class BulletControl : MonoBehaviour {
             if (hit.collider.gameObject.tag == "Player")
             {
                 hitPoint.SetActive(true);
-                //Vector3 p = Camera.main.WorldToScreenPoint(hit.point);
                 hitPoint.transform.position = hit.point;
+                hitPoint.transform.LookAt(hitPoint.transform.position + Camera.main.transform.rotation * Vector3.forward,
+                Camera.main.transform.rotation * Vector3.up);
             }
         }
     }
@@ -68,7 +83,12 @@ public class BulletControl : MonoBehaviour {
     {
         if (collision.gameObject.tag == "Player")
         {
-
+            Destroy(gameObject);
+            PlayerControl player = GameObject.FindObjectOfType<PlayerControl>();
+            if (player != null)
+            {
+                player.BloodEffect();
+            }
         }
     }
 }
