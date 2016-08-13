@@ -4,10 +4,10 @@ using System.Collections;
 
 [RequireComponent(typeof(Rigidbody))]
 public class BulletControl : MonoBehaviour {
+    public float WaitTime;
+
     [SerializeField]
     private float speed;
-    [SerializeField]
-    private float waitTime;
     [SerializeField]
     private GameObject hitPoint;
     [SerializeField]
@@ -26,23 +26,23 @@ public class BulletControl : MonoBehaviour {
         body = GetComponent<Rigidbody>();
         startTime = Time.time;
         sound = GetComponent<AudioSource>();
+    }
 
-        GameObject player = GameObject.FindGameObjectWithTag("Player");
-        if (player != null)
-        {
-            transform.LookAt(player.transform);
-        }
+    public void SetTarget(Vector3 position)
+    {
+        transform.LookAt(position);
     }
 
     void Update()
     {
         if (!start)
         {
-            if (Time.time - startTime > waitTime)
+            if (Time.time - startTime > WaitTime)
             {
                 start = true;
                 sound.Play();
                 timeText.gameObject.SetActive(false);
+                GetComponent<Collider>().enabled = true;
 
                 if (OnFire != null)
                 {
@@ -52,7 +52,7 @@ public class BulletControl : MonoBehaviour {
             else
             {
                 
-                double t = Math.Round(waitTime - (Time.time - startTime), 1, MidpointRounding.AwayFromZero);
+                double t = Math.Round(WaitTime - (Time.time - startTime), 1, MidpointRounding.AwayFromZero);
                 timeText.text = t.ToString();
             }
         }

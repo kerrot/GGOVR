@@ -5,8 +5,6 @@ public class GunControl : MonoBehaviour {
     [SerializeField]
     private GameObject bullet;
     [SerializeField]
-    private GameObject fire;
-    [SerializeField]
     private float spawnTime = 1f;
 
     private AudioSource au;
@@ -19,10 +17,15 @@ public class GunControl : MonoBehaviour {
 
     void Spawn()
     {
-        GameObject obj = Instantiate(bullet, fire.transform.position, Quaternion.identity) as GameObject;
+        GameObject obj = Instantiate(bullet, transform.position, Quaternion.identity) as GameObject;
         BulletControl b = obj.GetComponent<BulletControl>();
         if (b != null)
         {
+            GameObject player = GameObject.FindGameObjectWithTag("Player");
+            if (player != null)
+            {
+                b.SetTarget(player.transform.position);
+            }
             b.OnFire = FireAudio;
         }
     }
