@@ -44,6 +44,8 @@ public class BulletControl : MonoBehaviour {
                 timeText.gameObject.SetActive(false);
                 GetComponent<Collider>().enabled = true;
 
+                body.velocity = transform.forward * speed;
+                
                 if (OnFire != null)
                 {
                     OnFire();
@@ -56,6 +58,8 @@ public class BulletControl : MonoBehaviour {
                 timeText.text = t.ToString();
             }
         }
+
+        transform.LookAt(transform.position + body.velocity);
 
         hitPoint.SetActive(false);
         RaycastHit hit;
@@ -71,12 +75,9 @@ public class BulletControl : MonoBehaviour {
         }
     }
 
-    void FixedUpdate()
+    public void SetVelocity(Vector3 v)
     {
-        if (start)
-        {
-            body.velocity = transform.forward * speed;
-        }
+        body.velocity = v.normalized * speed;
     }
 
     void OnCollisionEnter(Collision collision)
