@@ -16,6 +16,7 @@ public class SetupGunControl : MonoBehaviour {
         public Vector3 position;
         public float shotTime;
         public float waitTime;
+        public float speed;
     }
 
     private List<SetupData> datas = new List<SetupData>();
@@ -32,6 +33,7 @@ public class SetupGunControl : MonoBehaviour {
             d.isRelative = t.isRelative;
             d.shotTime = t.shotTime;
             d.waitTime = t.waitTime;
+            d.speed = t.speed;
             d.position = (t.isRelative) ? t.transform.position - player.transform.position : t.transform.position;
             datas.Add(d);
             DestroyObject(t.gameObject);
@@ -46,6 +48,7 @@ public class SetupGunControl : MonoBehaviour {
             GameObject obj = Instantiate(bullet, transform.position, Quaternion.identity) as GameObject;
             BulletControl b = obj.GetComponent<BulletControl>();
             b.WaitTime = t.waitTime;
+            b.speed = t.speed;
             b.SetTarget((t.isRelative) ? player.transform.position + t.position : t.position);
             if (b != null)
             {

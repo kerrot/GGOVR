@@ -5,9 +5,8 @@ using System.Collections;
 [RequireComponent(typeof(Rigidbody))]
 public class BulletControl : MonoBehaviour {
     public float WaitTime;
+    public float speed;
 
-    [SerializeField]
-    private float speed;
     [SerializeField]
     private GameObject hitPoint;
     [SerializeField]
@@ -21,11 +20,14 @@ public class BulletControl : MonoBehaviour {
     bool start = false;
     AudioSource sound;
 
+    Scoremanager scoreMgr;
+
     void Start()
     {
         body = GetComponent<Rigidbody>();
         startTime = Time.time;
         sound = GetComponent<AudioSource>();
+        scoreMgr = GameObject.FindObjectOfType<Scoremanager>();
     }
 
     public void SetTarget(Vector3 position)
@@ -35,6 +37,7 @@ public class BulletControl : MonoBehaviour {
 
     void Update()
     {
+        double leftTime = WaitTime;
         if (!start)
         {
             if (Time.time - startTime > WaitTime)
@@ -54,8 +57,8 @@ public class BulletControl : MonoBehaviour {
             else
             {
                 
-                double t = Math.Round(WaitTime - (Time.time - startTime), 1, MidpointRounding.AwayFromZero);
-                timeText.text = t.ToString();
+                leftTime = Math.Round(WaitTime - (Time.time - startTime), 1, MidpointRounding.AwayFromZero);
+                timeText.text = leftTime.ToString();
             }
         }
 
@@ -69,8 +72,17 @@ public class BulletControl : MonoBehaviour {
             {
                 hitPoint.SetActive(true);
                 hitPoint.transform.position = hit.point;
-                hitPoint.transform.LookAt(hitPoint.transform.position + Camera.main.transform.rotation * Vector3.forward,
-                Camera.main.transform.rotation * Vector3.up);
+
+                Camera ca = Camera.main;
+                if (ca == null)
+                {
+                    ca = GameObject.FindObjectOfType<Camera>();
+                }
+
+                hitPoint.transform.LookAt(hitPoint.transform.position + ca.transform.rotation * Vector3.forward,
+                ca.transform.rotation * Vector3.up);
+
+                scoreMgr.AddPredictHit(leftTime);
             }
         }
     }
