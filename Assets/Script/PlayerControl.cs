@@ -1,4 +1,5 @@
 ﻿using UnityEngine;
+using UnityEngine.VR;
 using System.Collections;
 
 public class PlayerControl : MonoBehaviour {
@@ -35,6 +36,11 @@ public class PlayerControl : MonoBehaviour {
         if (Input.GetKey(KeyCode.Space))
         {
             SlowMotion();
+        }
+
+        if (Input.GetKey(KeyCode.R))
+        {
+            InputTracking.Recenter();
         }
     }
 
