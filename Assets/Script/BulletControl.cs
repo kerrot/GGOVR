@@ -1,6 +1,7 @@
 ﻿using UnityEngine;
 using System;
 using System.Collections;
+using System.Collections.Generic;
 
 [RequireComponent(typeof(Rigidbody))]
 public class BulletControl : MonoBehaviour {
@@ -15,19 +16,21 @@ public class BulletControl : MonoBehaviour {
     public delegate void BulletEvent();
     public BulletEvent OnFire;
 
+    private GameObject target;
+
     Rigidbody body;
     float startTime;
     bool start = false;
     AudioSource sound;
 
-    Scoremanager scoreMgr;
+    //Scoremanager scoreMgr;
 
     void Start()
     {
         body = GetComponent<Rigidbody>();
         startTime = Time.time;
         sound = GetComponent<AudioSource>();
-        scoreMgr = GameObject.FindObjectOfType<Scoremanager>();
+        //scoreMgr = GameObject.FindObjectOfType<Scoremanager>();
     }
 
     public void SetTarget(Vector3 position)
@@ -35,55 +38,29 @@ public class BulletControl : MonoBehaviour {
         transform.LookAt(position);
     }
 
+    public void SetTarget(GameObject t)
+    {
+        target = t;
+    }
+
     void Update()
     {
-        double leftTime = WaitTime;
-        if (!start)
-        {
-            if (Time.time - startTime > WaitTime)
-            {
-                start = true;
-                sound.Play();
-                timeText.gameObject.SetActive(false);
-                GetComponent<Collider>().enabled = true;
+        CheckFire();
 
-                body.velocity = transform.forward * speed;
-                
-                if (OnFire != null)
-                {
-                    OnFire();
-                }
-            }
-            else
-            {
-                
-                leftTime = Math.Round(WaitTime - (Time.time - startTime), 1, MidpointRounding.AwayFromZero);
-                timeText.text = leftTime.ToString();
-            }
+        ShowPredict();
+
+        FocusTarget();
+    }
+
+    void FocusTarget()
+    {
+        if (start)
+        {
+            transform.LookAt(transform.position + body.velocity);
         }
-
-        transform.LookAt(transform.position + body.velocity);
-
-        hitPoint.SetActive(false);
-        RaycastHit hit;
-        if (Physics.Raycast(transform.position, transform.forward, out hit))
+        else if (target != null)
         {
-            if (hit.collider.gameObject.tag == "Player")
-            {
-                hitPoint.SetActive(true);
-                hitPoint.transform.position = hit.point;
-
-                Camera ca = Camera.main;
-                if (ca == null)
-                {
-                    ca = GameObject.FindObjectOfType<Camera>();
-                }
-
-                hitPoint.transform.LookAt(hitPoint.transform.position + ca.transform.rotation * Vector3.forward,
-                ca.transform.rotation * Vector3.up);
-
-                scoreMgr.AddPredictHit(leftTime);
-            }
+            transform.LookAt(target.transform);
         }
     }
 
@@ -101,6 +78,64 @@ public class BulletControl : MonoBehaviour {
             if (player != null)
             {
                 player.BloodEffect();
+            }
+        }
+    }
+
+    void ShowPredict()
+    {
+        hitPoint.SetActive(false);
+        RaycastHit[] hits = Physics.RaycastAll(transform.position, transform.forward);
+        if (hits.Length > 0)
+        {
+            foreach (var hit in hits)
+            {
+                BariaControl baria = hit.collider.gameObject.GetComponent<BariaControl>();
+                if (baria != null)
+                {
+                    hitPoint.SetActive(true);
+                    hitPoint.transform.position = hit.point;
+
+                    Camera ca = Camera.main;
+                    if (ca == null)
+                    {
+                        ca = GameObject.FindObjectOfType<Camera>();
+                    }
+
+                    hitPoint.transform.LookAt(hitPoint.transform.position + ca.transform.rotation * Vector3.forward,
+                    ca.transform.rotation * Vector3.up);
+
+                    //scoreMgr.AddPredictHit(leftTime);
+                    return;
+                }
+            }
+        }
+    }
+
+    void CheckFire()
+    {
+        double leftTime = WaitTime;
+        if (!start)
+        {
+            if (Time.time - startTime > WaitTime)
+            {
+                start = true;
+                sound.Play();
+                timeText.gameObject.SetActive(false);
+                GetComponent<Collider>().enabled = true;
+
+                body.velocity = transform.forward * speed;
+
+                if (OnFire != null)
+                {
+                    OnFire();
+                }
+            }
+            else
+            {
+
+                leftTime = Math.Round(WaitTime - (Time.time - startTime), 1, MidpointRounding.AwayFromZero);
+                timeText.text = leftTime.ToString();
             }
         }
     }
