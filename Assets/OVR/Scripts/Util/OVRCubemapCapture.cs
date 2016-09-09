@@ -253,7 +253,7 @@ public class OVRCubemapCapture : MonoBehaviour
             // Encode the texture and save it to disk
             byte[] bytes = saveToPNG ? tex.EncodeToPNG() : tex.EncodeToJPG();
 
-            System.IO.File.WriteAllBytes(dirName + fileName, bytes);
+            //System.IO.File.WriteAllBytes(dirName + fileName, bytes);
             Debug.Log("Cubemap file created " + dirName + fileName);
         }
         catch (System.Exception e)
