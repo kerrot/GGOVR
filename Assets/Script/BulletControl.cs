@@ -1,5 +1,6 @@
 ﻿using UnityEngine;
 using System;
+using System.Linq;
 using System.Collections;
 using System.Collections.Generic;
 
@@ -11,7 +12,17 @@ public class BulletControl : MonoBehaviour {
     [SerializeField]
     private GameObject hitPoint;
     [SerializeField]
+    private GameObject warnPoint;
+    [SerializeField]
     private TextMesh timeText;
+    [SerializeField]
+    private GameObject line;
+    [SerializeField]
+    private Color hitColor;
+    [SerializeField]
+    private Color missColor;
+
+    private Material lineMat;
 
     public delegate void BulletEvent();
     public BulletEvent OnFire;
@@ -23,13 +34,12 @@ public class BulletControl : MonoBehaviour {
     bool start = false;
     AudioSource sound;
 
-    //Scoremanager scoreMgr;
-
     void Start()
     {
         body = GetComponent<Rigidbody>();
         startTime = Time.time;
         sound = GetComponent<AudioSource>();
+        lineMat = line.GetComponent<MeshRenderer>().material;
     }
 
     public void SetTarget(Vector3 position)
@@ -84,31 +94,59 @@ public class BulletControl : MonoBehaviour {
     void ShowPredict()
     {
         hitPoint.SetActive(false);
+        warnPoint.SetActive(false);
         RaycastHit[] hits = Physics.RaycastAll(transform.position, transform.forward);
         if (hits.Length > 0)
         {
-            foreach (var hit in hits)
+            RaycastHit p = hits.FirstOrDefault(h => h.collider.gameObject.GetComponent<PlayerControl>() != null);
+            if (p.collider != null)
             {
-                BariaControl baria = hit.collider.gameObject.GetComponent<BariaControl>();
-                if (baria != null)
+                lineMat.color = hitColor;
+                RaycastHit hit = hits.FirstOrDefault(h => h.collider.gameObject.tag == "UI");
+                if (hit.collider != null)
                 {
                     hitPoint.SetActive(true);
                     hitPoint.transform.position = hit.point;
 
-                    Camera ca = Camera.main;
-                    if (ca == null)
-                    {
-                        ca = GameObject.FindObjectOfType<Camera>();
-                    }
-
-                    hitPoint.transform.LookAt(hitPoint.transform.position + ca.transform.rotation * Vector3.forward,
-                    ca.transform.rotation * Vector3.up);
-
-                    //scoreMgr.AddPredictHit(leftTime);
-                    return;
+                    FaceCamera(hitPoint);
                 }
+                else
+                {
+                    warnPoint.SetActive(true);
+                    warnPoint.transform.position = ComputeWarnPosition(p);
+                    FaceCamera(warnPoint);
+                }
+                return;
             }
         }
+
+        lineMat.color = missColor;
+    }
+
+    void FaceCamera(GameObject obj)
+    {
+        Camera ca = Camera.main;
+        if (ca == null)
+        {
+            ca = GameObject.FindObjectOfType<Camera>();
+        }
+
+        obj.transform.LookAt(obj.transform.position + ca.transform.rotation * Vector3.forward, ca.transform.rotation * Vector3.up);
+    }
+
+    Vector3 ComputeWarnPosition(RaycastHit hit)
+    {
+        Vector3 local = hit.collider.transform.InverseTransformPoint(hit.point);
+        BoxCollider box = hit.collider as BoxCollider;
+        local.x /= box.size.x;
+        local.y /= box.size.y;
+
+        GameObject ui = GameObject.FindGameObjectWithTag("UI");
+        Vector3 uiCollider = ui.GetComponent<BoxCollider>().size;
+        Vector3 uiLocal = new Vector3(uiCollider.x * local.x, 0, 
+                                      uiCollider.z * -local.y);
+
+        return ui.transform.TransformPoint(uiLocal);
     }
 
     void CheckFire()
