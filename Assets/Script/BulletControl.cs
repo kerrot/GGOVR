@@ -30,7 +30,6 @@ public class BulletControl : MonoBehaviour {
         body = GetComponent<Rigidbody>();
         startTime = Time.time;
         sound = GetComponent<AudioSource>();
-        //scoreMgr = GameObject.FindObjectOfType<Scoremanager>();
     }
 
     public void SetTarget(Vector3 position)
