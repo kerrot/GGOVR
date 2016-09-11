@@ -6,6 +6,8 @@ public class PlayerControl : MonoBehaviour {
     [SerializeField]
     private GameObject blood;
     [SerializeField]
+    private GameObject menu;
+    [SerializeField]
     private float bloodTime;
 
 
@@ -25,9 +27,12 @@ public class PlayerControl : MonoBehaviour {
         }
     }
 
-    public void BloodEffect()
+    public void Hitted()
     {
         blood.SetActive(true);
         startTime = Time.realtimeSinceStartup;
+
+        Time.timeScale = 0;
+        menu.SetActive(true);
     }
 }

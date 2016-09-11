@@ -86,7 +86,7 @@ public class BulletControl : MonoBehaviour {
             PlayerControl player = GameObject.FindObjectOfType<PlayerControl>();
             if (player != null)
             {
-                player.BloodEffect();
+                player.Hitted();
             }
         }
     }

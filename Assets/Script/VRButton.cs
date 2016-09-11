@@ -6,7 +6,7 @@ public class VRButton : MonoBehaviour {
 	public string paramStr;
     
     [SerializeField]
-    private float second;
+    private int time;
 
     private GameObject observer;
     private int layerMask;
@@ -30,8 +30,7 @@ public class VRButton : MonoBehaviour {
 
     void Update()
     {
-        float step = (second > 0) ? Time.deltaTime / second : 1f;
-
+        float step = (time > 0) ? 1f / time : 1f;
         RaycastHit hit;
 		Debug.DrawRay(observer.transform.position, observer.transform.forward);
         if (Physics.Raycast(observer.transform.position, observer.transform.forward, out hit, Mathf.Infinity, layerMask))
