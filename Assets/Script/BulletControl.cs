@@ -99,7 +99,15 @@ public class BulletControl : MonoBehaviour {
     {
         hitPoint.SetActive(false);
         warnPoint.SetActive(false);
-        RaycastHit[] hits = Physics.SphereCastAll(transform.position, coll.radius* 2, transform.forward);
+        RaycastHit[] hits;
+        if (coll != null)
+        {
+            hits = Physics.SphereCastAll(transform.position, coll.radius * 2, transform.forward);
+        }
+        else
+        {
+            hits = Physics.RaycastAll(transform.position, transform.forward);
+        }
         if (hits.Length > 0)
         {
             RaycastHit p = hits.FirstOrDefault(h => h.collider.gameObject.GetComponent<PlayerControl>() != null);

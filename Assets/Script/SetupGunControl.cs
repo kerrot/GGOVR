@@ -5,8 +5,6 @@ using System.Collections;
 public class SetupGunControl : MonoBehaviour {
     [SerializeField]
     private GameObject bullet;
-    [SerializeField]
-    private GameObject playerBase;
 
     private AudioSource au;
 
@@ -38,7 +36,7 @@ public class SetupGunControl : MonoBehaviour {
             d.shotTime = t.shotTime;
             d.waitTime = t.waitTime;
             d.speed = t.speed;
-            d.position = (t.isRelative) ? t.transform.localPosition : t.transform.position;
+            d.position = (t.isRelative) ? t.transform.position - player.transform.position : t.transform.position;
             datas.Add(d);
             DestroyObject(t.gameObject);
         }

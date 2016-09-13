@@ -6,13 +6,11 @@ public class PlayerControl : MonoBehaviour {
     [SerializeField]
     private GameObject blood;
     [SerializeField]
-    private MenuContorl menu;
-    [SerializeField]
     private float bloodTime;
-
-
+    [SerializeField]
+    private MenuContorl menu;
+    
     private float startTime;
-
 
 	void Update ()
     {
@@ -32,7 +30,7 @@ public class PlayerControl : MonoBehaviour {
         blood.SetActive(true);
         startTime = Time.realtimeSinceStartup;
 
-        Time.timeScale = 0;
-        menu.ShowMenu(false);
+        //Time.timeScale = 0;
+        //menu.ShowMenu(false);
     }
 }
