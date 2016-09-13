@@ -9,6 +9,8 @@ public class BulletControl : MonoBehaviour {
     public float WaitTime;
     public float speed;
 
+    public bool IsHit { get { return lineMat.color == hitColor; } }
+
     [SerializeField]
     private GameObject hitPoint;
     [SerializeField]
@@ -33,6 +35,7 @@ public class BulletControl : MonoBehaviour {
     float startTime;
     bool start = false;
     AudioSource sound;
+    SphereCollider coll;
 
     void Start()
     {
@@ -40,6 +43,7 @@ public class BulletControl : MonoBehaviour {
         startTime = Time.time;
         sound = GetComponent<AudioSource>();
         lineMat = line.GetComponent<MeshRenderer>().material;
+        coll = GetComponent<SphereCollider>();
     }
 
     public void SetTarget(Vector3 position)
@@ -95,7 +99,7 @@ public class BulletControl : MonoBehaviour {
     {
         hitPoint.SetActive(false);
         warnPoint.SetActive(false);
-        RaycastHit[] hits = Physics.RaycastAll(transform.position, transform.forward);
+        RaycastHit[] hits = Physics.SphereCastAll(transform.position, coll.radius* 2, transform.forward);
         if (hits.Length > 0)
         {
             RaycastHit p = hits.FirstOrDefault(h => h.collider.gameObject.GetComponent<PlayerControl>() != null);
