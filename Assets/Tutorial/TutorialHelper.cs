@@ -6,11 +6,13 @@ public class TutorialHelper : MonoBehaviour {
     private GameObject hint;
     [SerializeField]
     private GameObject tutorialMenu;
+    [SerializeField]
+    private MenuContorl menu;
 
     private BulletControl current;
 
-    private int count;
-    private int total;
+    private int count = 0;
+    private int total = 0;
 
     void Start()
     {
@@ -20,19 +22,18 @@ public class TutorialHelper : MonoBehaviour {
     void OnTriggerEnter(Collider other)
     {
         BulletControl b = other.GetComponent<BulletControl>();
-        if (b != null && b.IsHit)
+        if (b != null)
         {
-            current = b;
-            Time.timeScale = 0;
+            if (b.IsHit)
+            {
+                current = b;
+                Time.timeScale = 0;
 
-            tutorialMenu.SetActive(true);
-            hint.SetActive(true);
+                tutorialMenu.SetActive(true);
+                hint.SetActive(true);
+            }
 
             ++count;
-            if (count == total)
-            {
-                TutorialClear();
-            }
         }
     }
 
@@ -46,10 +47,16 @@ public class TutorialHelper : MonoBehaviour {
             tutorialMenu.SetActive(false);
             hint.SetActive(false);
         }
+        else if (count == total)
+        {
+            ++count;
+            StartCoroutine(TutorialClear());
+        }
     }
 
-    void TutorialClear()
+    IEnumerator TutorialClear()
     {
-
+        yield return new WaitForSeconds(3);
+        menu.ShowMenu(true);
     }
 }

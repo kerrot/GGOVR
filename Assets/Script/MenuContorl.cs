@@ -5,7 +5,7 @@ using System.Collections;
 public class MenuContorl : MonoBehaviour {
 
 	[SerializeField]
-	private VRButton turtorial;
+	private VRButton title;
 	[SerializeField]
 	private VRButton LV1;
 	[SerializeField]
@@ -13,14 +13,21 @@ public class MenuContorl : MonoBehaviour {
 	[SerializeField]
 	private VRButton LV3;
 
-	void Start()
+    [SerializeField]
+    private GameObject clear;
+    [SerializeField]
+    private GameObject gameover;
+    [SerializeField]
+    private GameObject aim;
+
+    void Start()
 	{
-		turtorial.OnPress += LoadScene;
+		title.OnPress += LoadScene;
 		LV1.OnPress += LoadScene;
 		LV2.OnPress += LoadScene;
 		LV3.OnPress += LoadScene;
 
-		turtorial.paramStr = "Tutorial";
+		title.paramStr = "Tutorial";
 		LV1.paramStr = "LV1";
 		LV2.paramStr = "LV2";
 		LV3.paramStr = "LV3";
@@ -29,13 +36,22 @@ public class MenuContorl : MonoBehaviour {
 	void LoadScene(VRButton button)
 	{
 		SceneManager.LoadScene(button.paramStr);
-	}
+        Time.timeScale = 1;
+    }
 
 	void OnDestroy()
 	{
-		turtorial.OnPress -= LoadScene;
+		title.OnPress -= LoadScene;
 		LV1.OnPress -= LoadScene;
 		LV2.OnPress -= LoadScene;
 		LV3.OnPress -= LoadScene;
 	}
+
+    public void ShowMenu(bool win)
+    {
+        gameObject.SetActive(true);
+        clear.SetActive(win);
+        gameover.SetActive(!win);
+        aim.SetActive(true);
+    }
 }
