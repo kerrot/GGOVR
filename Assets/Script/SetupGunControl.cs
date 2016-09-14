@@ -5,6 +5,10 @@ using System.Collections;
 public class SetupGunControl : MonoBehaviour {
     [SerializeField]
     private GameObject bullet;
+	[SerializeField]
+	private float offset;
+	[SerializeField]
+	private float cloneCount;
 
     private AudioSource au;
 
@@ -40,8 +44,9 @@ public class SetupGunControl : MonoBehaviour {
             datas.Add(d);
             DestroyObject(t.gameObject);
         }
-
+			
         startTime = Time.time;
+		Debug.Log (startTime);
     }
 
     void Update()
@@ -49,15 +54,28 @@ public class SetupGunControl : MonoBehaviour {
         List<SetupData> tmp = datas.FindAll(d => d.shotTime + startTime < Time.time);
         tmp.ForEach(t =>
         {
-            GameObject obj = Instantiate(bullet, transform.position, Quaternion.identity) as GameObject;
-            BulletControl b = obj.GetComponent<BulletControl>();
-            b.WaitTime = t.waitTime;
-            b.speed = t.speed;
-            b.SetTarget((t.isRelative) ? player.transform.position + t.position : t.position);
-            if (b != null)
-            {
-                b.OnFire = FireAudio;
-            }
+			if (offset > 0 && cloneCount > 0)
+			{
+					float tmpOffset = 0;
+
+					for (int i = 0; i <= cloneCount; ++i)
+					{
+						if ( i == 0)
+						{
+							GenerateBullet(t, 0);
+						}
+						else
+						{
+							GenerateBullet(t, tmpOffset);
+							GenerateBullet(t, -tmpOffset);
+						}
+						tmpOffset += offset;
+					}
+			}
+			else
+			{
+					GenerateBullet(t, 0);
+			}
         });
 
         tmp.ForEach(t => datas.Remove(t));
@@ -67,4 +85,19 @@ public class SetupGunControl : MonoBehaviour {
     {
         au.Play();
     }
+
+	void GenerateBullet(SetupData t, float offset)
+	{
+		GameObject obj = Instantiate(bullet, transform.position + new Vector3(0, offset, 0), Quaternion.identity) as GameObject;
+		BulletControl b = obj.GetComponent<BulletControl>();
+		b.WaitTime = t.waitTime;
+		b.speed = t.speed;
+		Vector3 tmpTarget = (t.isRelative) ? player.transform.position + t.position : t.position;
+		b.SetTarget(tmpTarget + new Vector3(0, offset, 0));
+
+		if (b != null)
+		{
+			b.OnFire = FireAudio;
+		}
+	}
 }

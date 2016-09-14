@@ -31,6 +31,8 @@ public class MenuContorl : MonoBehaviour {
 		LV1.paramStr = "LV1";
 		LV2.paramStr = "LV2";
 		LV3.paramStr = "LV3";
+
+		aim.SetActive(true);
 	}
 
 	void LoadScene(VRButton button)

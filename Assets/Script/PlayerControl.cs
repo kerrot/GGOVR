@@ -30,7 +30,7 @@ public class PlayerControl : MonoBehaviour {
         blood.SetActive(true);
         startTime = Time.realtimeSinceStartup;
 
-        //Time.timeScale = 0;
-        //menu.ShowMenu(false);
+        Time.timeScale = 0;
+        menu.ShowMenu(false);
     }
 }

@@ -6,10 +6,13 @@ public class StartMenu : MonoBehaviour {
     private VRButton start;
     [SerializeField]
     private GameObject tutorialMenu;
+	[SerializeField]
+	private GameObject aim;
 
     void Start()
     {
         start.OnPress += TutorialMenu;
+		aim.SetActive(true);
     }
 
     void TutorialMenu(VRButton button)
