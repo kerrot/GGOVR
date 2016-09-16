@@ -4,6 +4,10 @@ using System.Collections;
 public class TutorialMenu : MonoBehaviour {
     [SerializeField]
     private VRButton start;
+	[SerializeField]
+	private VRButton menuButton;
+	[SerializeField]
+	private MenuContorl menu;
     [SerializeField]
     private GameObject game;
     [SerializeField]
@@ -12,6 +16,8 @@ public class TutorialMenu : MonoBehaviour {
     void Start()
     {
         start.OnPress += StartGame;
+		menuButton.OnPress += Menu;
+		aim.SetActive(true);
     }
 
     void StartGame(VRButton button)
@@ -22,8 +28,15 @@ public class TutorialMenu : MonoBehaviour {
         aim.SetActive(false);
     }
 
+	void Menu(VRButton button)
+	{
+		menu.TitleMenu();
+		gameObject.SetActive(false);
+	}
+
     void OnDestroy()
     {
         start.OnPress -= StartGame;
+		menuButton.OnPress -= Menu;
     }
 }

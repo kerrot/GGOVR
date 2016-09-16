@@ -9,8 +9,11 @@ public class SetupGunControl : MonoBehaviour {
 	private float offset;
 	[SerializeField]
 	private float cloneCount;
+	[SerializeField]
+	private GameObject setup;
 
     private AudioSource au;
+
 
     private PlayerControl player;
 
@@ -30,9 +33,15 @@ public class SetupGunControl : MonoBehaviour {
     void Start()
     {
         au = GetComponent<AudioSource>();
+
+		if (setup == null) 
+		{
+			setup = gameObject;
+		}
+
         player = GameObject.FindObjectOfType<PlayerControl>();
 
-        SetupTarget[] targets = GameObject.FindObjectsOfType<SetupTarget>();
+		SetupTarget[] targets = setup.GetComponentsInChildren<SetupTarget>();
         foreach (SetupTarget t in targets)
         {
             SetupData d = new SetupData();
@@ -54,8 +63,10 @@ public class SetupGunControl : MonoBehaviour {
         List<SetupData> tmp = datas.FindAll(d => d.shotTime + startTime < Time.time);
         tmp.ForEach(t =>
         {
+				
 			if (offset > 0 && cloneCount > 0)
 			{
+					Debug.Log (t.position);
 					float tmpOffset = 0;
 
 					for (int i = 0; i <= cloneCount; ++i)

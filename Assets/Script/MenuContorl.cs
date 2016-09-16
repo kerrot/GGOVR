@@ -19,6 +19,8 @@ public class MenuContorl : MonoBehaviour {
     private GameObject gameover;
     [SerializeField]
     private GameObject aim;
+	[SerializeField]
+	private GameObject logo;
 
     void Start()
 	{
@@ -55,5 +57,16 @@ public class MenuContorl : MonoBehaviour {
         clear.SetActive(win);
         gameover.SetActive(!win);
         aim.SetActive(true);
+		logo.SetActive (false);
     }
+
+	public void TitleMenu()
+	{
+		gameObject.SetActive(true);
+		clear.SetActive(false);
+		gameover.SetActive(false);
+		aim.SetActive(true);
+		logo.SetActive (true);
+		title.gameObject.SetActive(false);
+	}
 }
