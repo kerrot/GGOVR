@@ -57,7 +57,10 @@ public class MenuContorl : MonoBehaviour {
         clear.SetActive(win);
         gameover.SetActive(!win);
         aim.SetActive(true);
-		logo.SetActive (false);
+        if (logo)
+        {
+            logo.SetActive(false);
+        }
     }
 
 	public void TitleMenu()
@@ -66,7 +69,10 @@ public class MenuContorl : MonoBehaviour {
 		clear.SetActive(false);
 		gameover.SetActive(false);
 		aim.SetActive(true);
-		logo.SetActive (true);
-		title.gameObject.SetActive(false);
+        if (logo)
+        {
+            logo.SetActive(true);
+        }
+        title.gameObject.SetActive(false);
 	}
 }
