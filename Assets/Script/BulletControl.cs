@@ -118,7 +118,7 @@ public class BulletControl : MonoBehaviour {
                 if (hit.collider != null)
                 {
                     hitPoint.SetActive(true);
-                    hitPoint.transform.position = hit.point;
+					hitPoint.transform.position = ProjectOnPlane (hit.collider.gameObject);
 
                     FaceCamera(hitPoint);
                 }
@@ -134,6 +134,11 @@ public class BulletControl : MonoBehaviour {
 
         lineMat.color = missColor;
     }
+
+	Vector3 ProjectOnPlane(GameObject plane)
+	{
+		return plane.transform.position + Vector3.ProjectOnPlane (transform.position - plane.transform.position, plane.transform.up);
+	}
 
     void FaceCamera(GameObject obj)
     {
