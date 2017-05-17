@@ -55,7 +55,7 @@ public class SetupGunControl : MonoBehaviour {
         }
 			
         startTime = Time.time;
-		Debug.Log (startTime);
+		//Debug.Log (startTime);
     }
 
     void Update()
@@ -66,7 +66,7 @@ public class SetupGunControl : MonoBehaviour {
 				
 			if (offset > 0 && cloneCount > 0)
 			{
-					Debug.Log (t.position);
+					//Debug.Log (t.position);
 					float tmpOffset = 0;
 
 					for (int i = 0; i <= cloneCount; ++i)

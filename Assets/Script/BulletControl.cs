@@ -102,7 +102,7 @@ public class BulletControl : MonoBehaviour {
         RaycastHit[] hits;
         if (coll != null)
         {
-            hits = Physics.SphereCastAll(transform.position, coll.radius * 2, transform.forward);
+            hits = Physics.SphereCastAll(transform.position, coll.radius + 0.001f, transform.forward);
         }
         else
         {
@@ -118,9 +118,23 @@ public class BulletControl : MonoBehaviour {
                 if (hit.collider != null)
                 {
                     hitPoint.SetActive(true);
-					hitPoint.transform.position = ProjectOnPlane (hit.collider.gameObject);
+                    hitPoint.transform.parent = hit.collider.gameObject.transform;
 
-                    FaceCamera(hitPoint);
+                    RaycastHit[] tmpHits = Physics.RaycastAll(transform.position, transform.forward);
+                    RaycastHit tmpHit = tmpHits.SingleOrDefault(t => t.collider.gameObject == hit.collider.gameObject);
+                    if (tmpHit.collider != null)
+                    {
+                        hitPoint.transform.position = tmpHit.point;
+                    }
+                    else
+                    {
+                        hitPoint.transform.position = hit.point;
+                    }
+                    Vector3 tmp = hitPoint.transform.localPosition;
+                    tmp.y = 0.02f;
+                    hitPoint.transform.localPosition = tmp;
+
+                    hitPoint.transform.localRotation = Quaternion.Euler(-90, 0, 0);
                 }
                 else
                 {
@@ -134,11 +148,6 @@ public class BulletControl : MonoBehaviour {
 
         lineMat.color = missColor;
     }
-
-	Vector3 ProjectOnPlane(GameObject plane)
-	{
-		return plane.transform.position + Vector3.ProjectOnPlane (transform.position - plane.transform.position, plane.transform.up);
-	}
 
     void FaceCamera(GameObject obj)
     {
@@ -192,5 +201,10 @@ public class BulletControl : MonoBehaviour {
                 timeText.text = leftTime.ToString();
             }
         }
+    }
+
+    private void OnDestroy()
+    {
+        DestroyObject(hitPoint);
     }
 }

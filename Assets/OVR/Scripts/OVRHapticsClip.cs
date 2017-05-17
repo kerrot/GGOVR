@@ -1,10 +1,24 @@
 ﻿using UnityEngine;
 using System.Collections;
 
+/// <summary>
+/// A PCM buffer of data for a haptics effect.
+/// </summary>
 public class OVRHapticsClip
 {
+	/// <summary>
+	/// The current number of samples in the clip.
+	/// </summary>
 	public int Count { get; private set; }
+
+	/// <summary>
+	/// The maximum number of samples the clip can store.
+	/// </summary>
 	public int Capacity { get; private set; }
+
+	/// <summary>
+	/// The raw haptics data.
+	/// </summary>
 	public byte[] Samples { get; private set; }
 
 	public OVRHapticsClip()
@@ -13,12 +27,18 @@ public class OVRHapticsClip
 		Samples = new byte[Capacity * OVRHaptics.Config.SampleSizeInBytes];
 	}
 
+	/// <summary>
+	/// Creates a clip with the specified capacity.
+	/// </summary>
 	public OVRHapticsClip(int capacity)
 	{
 		Capacity = (capacity >= 0) ? capacity : 0;
 		Samples = new byte[Capacity * OVRHaptics.Config.SampleSizeInBytes];
 	}
 
+	/// <summary>
+	/// Creates a clip with the specified data.
+	/// </summary>
 	public OVRHapticsClip(byte[] samples, int samplesCount)
 	{
 		Samples = samples;
@@ -26,6 +46,9 @@ public class OVRHapticsClip
 		Count = (samplesCount >= 0) ? samplesCount : 0;
 	}
 
+	/// <summary>
+	/// Creates a clip by mixing the specified clips.
+	/// </summary>
 	public OVRHapticsClip(OVRHapticsClip a, OVRHapticsClip b)
 	{
 		int maxCount = a.Count;
@@ -52,6 +75,9 @@ public class OVRHapticsClip
 		}
 	}
 
+	/// <summary>
+	/// Creates a haptics clip from the specified audio clip.
+	/// </summary>
 	public OVRHapticsClip(AudioClip audioClip, int channel = 0)
 	{
 		float[] audioData = new float[audioClip.samples * audioClip.channels];
@@ -60,6 +86,9 @@ public class OVRHapticsClip
 		InitializeFromAudioFloatTrack(audioData, audioClip.frequency, audioClip.channels, channel);
 	}
 
+	/// <summary>
+	/// Adds the specified sample to the end of the clip.
+	/// </summary>
 	public void WriteSample(byte sample) // TODO support multi-byte samples
 	{
 		if (Count >= Capacity)
@@ -76,6 +105,9 @@ public class OVRHapticsClip
 		Count++;
 	}
 
+	/// <summary>
+	/// Clears the clip and resets its size to 0.
+	/// </summary>
 	public void Reset()
 	{
 		Count = 0;
@@ -83,7 +115,11 @@ public class OVRHapticsClip
 
 	private void InitializeFromAudioFloatTrack(float[] sourceData, double sourceFrequency, int sourceChannelCount, int sourceChannel)
 	{
-		double stepSizePrecise = sourceFrequency / OVRHaptics.Config.SampleRateHz;
+		double stepSizePrecise = (sourceFrequency + 1e-6) / OVRHaptics.Config.SampleRateHz;
+
+		if (stepSizePrecise < 1.0)
+			return;
+
 		int stepSize = (int)stepSizePrecise;
 		double stepSizeError = stepSizePrecise - stepSize;
 		double accumulatedStepSizeError = 0.0f;

@@ -107,7 +107,7 @@ public class OVRCubemapCapture : MonoBehaviour
 		// Enable 8X MSAA
 		RenderTexture faceTexture = new RenderTexture(width, height, 24);
 		faceTexture.antiAliasing = 8;
-#if !(UNITY_5_0 || UNITY_5_1 || UNITY_5_2 || UNITY_5_3)
+#if UNITY_5_4_OR_NEWER
 		faceTexture.dimension = UnityEngine.Rendering.TextureDimension.Tex2D;
 #endif
 		faceTexture.hideFlags = HideFlags.HideAndDontSave;
@@ -253,7 +253,7 @@ public class OVRCubemapCapture : MonoBehaviour
             // Encode the texture and save it to disk
             byte[] bytes = saveToPNG ? tex.EncodeToPNG() : tex.EncodeToJPG();
 
-            //System.IO.File.WriteAllBytes(dirName + fileName, bytes);
+            System.IO.File.WriteAllBytes(dirName + fileName, bytes);
             Debug.Log("Cubemap file created " + dirName + fileName);
         }
         catch (System.Exception e)

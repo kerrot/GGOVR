@@ -5,6 +5,9 @@ using System.Collections;
 using System.Collections.Generic;
 using System.Runtime.InteropServices;
 
+/// <summary>
+/// Plays tactile effects on a tracked VR controller.
+/// </summary>
 public static class OVRHaptics
 {
 	public readonly static OVRHapticsChannel[] Channels;
@@ -30,6 +33,9 @@ public static class OVRHaptics
 		};
 	}
 
+	/// <summary>
+	/// Determines the target format for haptics data on a specific device.
+	/// </summary>
 	public static class Config
 	{
 		public static int SampleRateHz { get; private set; }
@@ -57,30 +63,48 @@ public static class OVRHaptics
 		}
 	}
 
+	/// <summary>
+	/// A track of haptics data that can be mixed or sequenced with another track.
+	/// </summary>
 	public class OVRHapticsChannel
 	{
 		private OVRHapticsOutput m_output;
 
+		/// <summary>
+		/// Constructs a channel targeting the specified output.
+		/// </summary>
 		public OVRHapticsChannel(uint outputIndex)
 		{
 			m_output = m_outputs[outputIndex];
 		}
 
+		/// <summary>
+		/// Cancels any currently-playing clips and immediatly plays the specified clip instead.
+		/// </summary>
 		public void Preempt(OVRHapticsClip clip)
 		{
 			m_output.Preempt(clip);
 		}
 
+		/// <summary>
+		/// Enqueues the specified clip to play after any currently-playing clips finish.
+		/// </summary>
 		public void Queue(OVRHapticsClip clip)
 		{
 			m_output.Queue(clip);
 		}
 
+		/// <summary>
+		/// Adds the specified clip to play simultaneously to the currently-playing clip(s).
+		/// </summary>
 		public void Mix(OVRHapticsClip clip)
 		{
 			m_output.Mix(clip);
 		}
 
+		/// <summary>
+		/// Cancels any currently-playing clips.
+		/// </summary>
 		public void Clear()
 		{
 			m_output.Clear();
@@ -89,39 +113,6 @@ public static class OVRHaptics
 
 	private class OVRHapticsOutput
 	{
-		private class NativeBuffer
-		{
-			private int m_numBytes = 0;
-			private IntPtr m_ptr = IntPtr.Zero;
-
-			public IntPtr GetPointer(int byteOffset = 0)
-			{
-				if (byteOffset < 0 || byteOffset >= m_numBytes)
-				{
-					//Debug.LogError("Attempted invalid access - Allocated: " + m_numBytes + " Requested: " + byteOffset);
-					return IntPtr.Zero;
-				}
-
-				return (byteOffset == 0) ? m_ptr : new IntPtr(m_ptr.ToInt64() + byteOffset);
-			}
-
-			public NativeBuffer(int numBytes)
-			{
-				m_ptr = Marshal.AllocHGlobal(numBytes);
-				m_numBytes = numBytes;
-			}
-
-			~NativeBuffer()
-			{
-				if (m_ptr != IntPtr.Zero)
-				{
-					Marshal.FreeHGlobal(m_ptr);
-					m_ptr = IntPtr.Zero;
-					m_numBytes = 0;
-				}
-			}
-		}
-
 		private class ClipPlaybackTracker
 		{
 			public int ReadCount { get; set; }
@@ -141,7 +132,7 @@ public static class OVRHaptics
 		private int m_numUnderruns = 0;
 		private List<ClipPlaybackTracker> m_pendingClips = new List<ClipPlaybackTracker>();
 		private uint m_controller = 0;
-		private NativeBuffer m_nativeBuffer = new NativeBuffer(OVRHaptics.Config.MaximumBufferSamplesCount * OVRHaptics.Config.SampleSizeInBytes);
+		private OVRNativeBuffer m_nativeBuffer = new OVRNativeBuffer(OVRHaptics.Config.MaximumBufferSamplesCount * OVRHaptics.Config.SampleSizeInBytes);
 		private OVRHapticsClip m_paddingClip = new OVRHapticsClip();
 
 		public OVRHapticsOutput(uint controller)
@@ -149,6 +140,9 @@ public static class OVRHaptics
 			m_controller = controller;
 		}
 
+		/// <summary>
+		/// The system calls this each frame to update haptics playback.
+		/// </summary>
 		public void Process()
 		{
 			var hapticsState = OVRPlugin.GetControllerHapticsState(m_controller);
@@ -259,17 +253,26 @@ public static class OVRHaptics
 			}
 		}
 
+		/// <summary>
+		/// Immediately plays the specified clip without waiting for any currently-playing clip to finish.
+		/// </summary>
 		public void Preempt(OVRHapticsClip clip)
 		{
 			m_pendingClips.Clear();
 			m_pendingClips.Add(new ClipPlaybackTracker(clip));
 		}
 
+		/// <summary>
+		/// Enqueues the specified clip to play after any currently-playing clip finishes.
+		/// </summary>
 		public void Queue(OVRHapticsClip clip)
 		{
 			m_pendingClips.Add(new ClipPlaybackTracker(clip));
 		}
 
+		/// <summary>
+		/// Adds the samples from the specified clip to the ones in the currently-playing clip(s).
+		/// </summary>
 		public void Mix(OVRHapticsClip clip)
 		{
 			int numClipsToMix = 0;
@@ -347,6 +350,9 @@ public static class OVRHaptics
 		}
 	}
 
+	/// <summary>
+	/// The system calls this each frame to update haptics playback.
+	/// </summary>
 	public static void Process()
 	{
 		Config.Load();
