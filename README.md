@@ -7,4 +7,4 @@ This game is designed based on mini game in GGO(Sword art online).
 You can just use your head movment to dodge the bullets attack you.   
 And use gaze to control the UI. No need gamepad.   
 You can also see so called "Predict line" to know where bullets go to.   
-And dodge like what you will do in real world.   
+And just dodge before the bullet reach you like what you will do in real world.   
