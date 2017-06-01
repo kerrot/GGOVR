@@ -1,17 +1,21 @@
 ﻿using UnityEngine;
 using UnityEngine.SceneManagement;
 using System.Collections;
+using System;
+using System.Collections.Generic;
 
+// show menu to change scene
 public class MenuContorl : MonoBehaviour {
 
-	[SerializeField]
-	private VRButton title;
-	[SerializeField]
-	private VRButton LV1;
-	[SerializeField]
-	private VRButton LV2;
-	[SerializeField]
-	private VRButton LV3;
+    [System.Serializable]
+    public struct LVData
+    {
+        public VRButton btn;
+        public string levelName;
+    }
+
+    [SerializeField]
+    private List<LVData> levels = new List<LVData>();
 
     [SerializeField]
     private GameObject clear;
@@ -21,18 +25,23 @@ public class MenuContorl : MonoBehaviour {
     private GameObject aim;
 	[SerializeField]
 	private GameObject logo;
+    [SerializeField]
+    private GameObject title;
+
+    float oriTimeSpeed;
+
+    private void Awake()
+    {
+        oriTimeSpeed = Time.timeScale;
+    }
 
     void Start()
 	{
-		title.OnPress += LoadScene;
-		LV1.OnPress += LoadScene;
-		LV2.OnPress += LoadScene;
-		LV3.OnPress += LoadScene;
-
-		title.paramStr = "Tutorial";
-		LV1.paramStr = "LV1";
-		LV2.paramStr = "LV2";
-		LV3.paramStr = "LV3";
+        levels.ForEach(l =>
+        {
+            l.btn.OnPress += LoadScene;
+            l.btn.paramStr = l.levelName;
+        });
 
 		aim.SetActive(true);
 	}
@@ -40,16 +49,13 @@ public class MenuContorl : MonoBehaviour {
 	void LoadScene(VRButton button)
 	{
 		SceneManager.LoadScene(button.paramStr);
-        Time.timeScale = 1;
+        Time.timeScale = oriTimeSpeed;
     }
 
 	void OnDestroy()
 	{
-		title.OnPress -= LoadScene;
-		LV1.OnPress -= LoadScene;
-		LV2.OnPress -= LoadScene;
-		LV3.OnPress -= LoadScene;
-	}
+        levels.ForEach(l => l.btn.OnPress -= LoadScene);
+    }
 
     public void ShowMenu(bool win)
     {
@@ -73,6 +79,6 @@ public class MenuContorl : MonoBehaviour {
         {
             logo.SetActive(true);
         }
-        title.gameObject.SetActive(false);
+        title.SetActive(false);
 	}
 }

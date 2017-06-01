@@ -1,6 +1,7 @@
 ﻿using UnityEngine;
 using System.Collections;
 
+// generate bullet periodically
 public class GunControl : MonoBehaviour {
     [SerializeField]
     private GameObject bullet;

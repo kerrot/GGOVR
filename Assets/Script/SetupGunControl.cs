@@ -2,14 +2,15 @@
 using System.Collections.Generic;
 using System.Collections;
 
+// generate bullet, read SetupTarget in the child and automatically setup
 public class SetupGunControl : MonoBehaviour {
     [SerializeField]
     private GameObject bullet;
 	[SerializeField]
-	private float offset;
-	[SerializeField]
-	private float cloneCount;
-	[SerializeField]
+	private float offset;       //the offset of vertical bullet group for each bullet
+    [SerializeField]
+	private float cloneCount;   //the amount of vertical bullet group
+    [SerializeField]
 	private GameObject setup;
 
     private AudioSource au;
@@ -55,18 +56,17 @@ public class SetupGunControl : MonoBehaviour {
         }
 			
         startTime = Time.time;
-		//Debug.Log (startTime);
     }
 
     void Update()
     {
+        // check if is the time to generate
         List<SetupData> tmp = datas.FindAll(d => d.shotTime + startTime < Time.time);
         tmp.ForEach(t =>
         {
 				
 			if (offset > 0 && cloneCount > 0)
 			{
-					//Debug.Log (t.position);
 					float tmpOffset = 0;
 
 					for (int i = 0; i <= cloneCount; ++i)
@@ -97,12 +97,13 @@ public class SetupGunControl : MonoBehaviour {
         au.Play();
     }
 
+    // generate bullet group
 	void GenerateBullet(SetupData t, float offset)
 	{
 		GameObject obj = Instantiate(bullet, transform.position + new Vector3(0, offset, 0), Quaternion.identity) as GameObject;
 		BulletControl b = obj.GetComponent<BulletControl>();
 		b.WaitTime = t.waitTime;
-		b.speed = t.speed;
+		b.Speed = t.speed;
 		Vector3 tmpTarget = (t.isRelative) ? player.transform.position + t.position : t.position;
 		b.SetTarget(tmpTarget + new Vector3(0, offset, 0));
 

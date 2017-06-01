@@ -1,6 +1,7 @@
 ﻿using UnityEngine;
 using System.Collections;
 
+// make object always face camera
 public class BillBoard : MonoBehaviour {
 
     void Update()

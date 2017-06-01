@@ -1,6 +1,7 @@
 ﻿using UnityEngine;
 using System.Collections;
 
+//button in VR. use gaze to click. check the sacle of ready object to determine
 public class VRButton : MonoBehaviour {
     
 	public string paramStr;
@@ -30,6 +31,7 @@ public class VRButton : MonoBehaviour {
 
     void Update()
     {
+        // if time not set, always be 1 second.
         float step = (time > 0) ? 1f / time : 1f;
         RaycastHit hit;
 		Debug.DrawRay(observer.transform.position, observer.transform.forward);
@@ -41,6 +43,7 @@ public class VRButton : MonoBehaviour {
                 tmp.x += step;
                 ready.transform.localScale = tmp;
 
+                //check x scale
                 if (tmp.x >= 1)
                 {
                     tmp.x = 0;

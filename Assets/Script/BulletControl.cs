@@ -4,13 +4,9 @@ using System.Linq;
 using System.Collections;
 using System.Collections.Generic;
 
+// control bullet when to fire, where to fire, and behavior in this process
 [RequireComponent(typeof(Rigidbody))]
 public class BulletControl : MonoBehaviour {
-    public float WaitTime;
-    public float speed;
-
-    public bool IsHit { get { return lineMat.color == hitColor; } }
-
     [SerializeField]
     private GameObject hitPoint;
     [SerializeField]
@@ -24,18 +20,32 @@ public class BulletControl : MonoBehaviour {
     [SerializeField]
     private Color missColor;
 
-    private Material lineMat;
+    public bool IsHit { get { return lineMat.color == hitColor; } }
 
     public delegate void BulletEvent();
-    public BulletEvent OnFire;
+    public BulletEvent OnFire;          //call back when bullet fire
 
-    private GameObject target;
+    private float waitTime;
+    public float WaitTime
+    {
+        get { return waitTime; }
+        set { waitTime = value; }
+    }
+    private float speed;
+    public float Speed
+    {
+        get { return speed; }
+        set { speed = value; }
+    }
 
-    Rigidbody body;
-    float startTime;
-    bool start = false;
+    private GameObject target;  // the target to attack
+    private Material lineMat;   
+    
+    float startTime;        //the time when ready to fire
+    bool isfired = false;
     AudioSource sound;
     SphereCollider coll;
+    Rigidbody body;
 
     void Start()
     {
@@ -67,7 +77,7 @@ public class BulletControl : MonoBehaviour {
 
     void FocusTarget()
     {
-        if (start)
+        if (isfired)
         {
             transform.LookAt(transform.position + body.velocity);
         }
@@ -95,6 +105,7 @@ public class BulletControl : MonoBehaviour {
         }
     }
 
+    // show the predict line
     void ShowPredict()
     {
         hitPoint.SetActive(false);
@@ -102,7 +113,7 @@ public class BulletControl : MonoBehaviour {
         RaycastHit[] hits;
         if (coll != null)
         {
-            hits = Physics.SphereCastAll(transform.position, coll.radius + 0.001f, transform.forward);
+            hits = Physics.SphereCastAll(transform.position, coll.radius, transform.forward);
         }
         else
         {
@@ -113,13 +124,16 @@ public class BulletControl : MonoBehaviour {
             RaycastHit p = hits.FirstOrDefault(h => h.collider.gameObject.GetComponent<PlayerControl>() != null);
             if (p.collider != null)
             {
+                // hit player
                 lineMat.color = hitColor;
                 RaycastHit hit = hits.FirstOrDefault(h => h.collider.gameObject.tag == "UI");
                 if (hit.collider != null)
                 {
+                    // hit camera area
                     hitPoint.SetActive(true);
                     hitPoint.transform.parent = hit.collider.gameObject.transform;
 
+                    #region Test Code For Oculus CV1, Unity5.6. UI disappear even in the visible region of camera
                     RaycastHit[] tmpHits = Physics.RaycastAll(transform.position, transform.forward);
                     RaycastHit tmpHit = tmpHits.SingleOrDefault(t => t.collider.gameObject == hit.collider.gameObject);
                     if (tmpHit.collider != null)
@@ -135,9 +149,11 @@ public class BulletControl : MonoBehaviour {
                     hitPoint.transform.localPosition = tmp;
 
                     hitPoint.transform.localRotation = Quaternion.Euler(-90, 0, 0);
+                    #endregion
                 }
                 else
                 {
+                    // when player hitted but the place not in the camera area
                     warnPoint.SetActive(true);
                     warnPoint.transform.position = ComputeWarnPosition(p);
                     FaceCamera(warnPoint);
@@ -160,6 +176,7 @@ public class BulletControl : MonoBehaviour {
         obj.transform.LookAt(obj.transform.position + ca.transform.rotation * Vector3.forward, ca.transform.rotation * Vector3.up);
     }
 
+    //Compute the position to UI according to the place the player hitted
     Vector3 ComputeWarnPosition(RaycastHit hit)
     {
         Vector3 local = hit.collider.transform.InverseTransformPoint(hit.point);
@@ -175,14 +192,15 @@ public class BulletControl : MonoBehaviour {
         return ui.transform.TransformPoint(uiLocal);
     }
 
+    // check when to fire
     void CheckFire()
     {
-        double leftTime = WaitTime;
-        if (!start)
+        double leftTime = waitTime;
+        if (!isfired)
         {
-            if (Time.time - startTime > WaitTime)
+            if (Time.time - startTime > waitTime)
             {
-                start = true;
+                isfired = true;
                 sound.Play();
                 timeText.gameObject.SetActive(false);
                 GetComponent<Collider>().enabled = true;
@@ -197,7 +215,7 @@ public class BulletControl : MonoBehaviour {
             else
             {
 
-                leftTime = Math.Round(WaitTime - (Time.time - startTime), 1, MidpointRounding.AwayFromZero);
+                leftTime = Math.Round(waitTime - (Time.time - startTime), 1, MidpointRounding.AwayFromZero);
                 timeText.text = leftTime.ToString();
             }
         }

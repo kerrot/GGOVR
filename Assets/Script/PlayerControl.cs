@@ -2,6 +2,7 @@
 using UnityEngine.VR;
 using System.Collections;
 
+// when dead, show blood effect and pause game
 public class PlayerControl : MonoBehaviour {
     [SerializeField]
     private GameObject blood;

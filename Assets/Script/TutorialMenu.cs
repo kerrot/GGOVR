@@ -1,6 +1,7 @@
 ﻿using UnityEngine;
 using System.Collections;
 
+// TutorialMenu setup
 public class TutorialMenu : MonoBehaviour {
     [SerializeField]
     private VRButton start;

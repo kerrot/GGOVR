@@ -1,6 +1,7 @@
 ﻿using UnityEngine;
 using System.Collections;
 
+// show the waring in Tutorial stage when player is going to be hitted
 public class TutorialHelper : MonoBehaviour {
     [SerializeField]
     private GameObject hint;
